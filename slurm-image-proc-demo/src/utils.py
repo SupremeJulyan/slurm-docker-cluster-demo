@@ -1,4 +1,5 @@
 import os
+import numpy as np
 def replace_up_dir(path, new_dir):
     parts = path.split('/')
     if len(parts) >= 3:  # 确保路径包含根目录、两级目录和文件名
@@ -44,3 +45,9 @@ def add_str_to_filename(path, string):
     # 在文件名后添加后缀并重组路径
     new_filename = f"{main_name}{string}{extension}"
     return directory + new_filename
+
+def array_split(array,n):
+    if n > 1:
+        chunks = np.array_split(array,n)
+        return [list(c) for c in chunks]
+    return array
