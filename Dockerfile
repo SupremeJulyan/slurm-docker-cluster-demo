@@ -32,12 +32,26 @@ RUN set -ex \
        vim-enhanced \
        http-parser-devel \
        json-c-devel \
+       openmpi \ 
+       openmpi-devel \
+       curl-devel \
+       bc \
     && yum clean all \
     && rm -rf /var/cache/yum
 
 RUN alternatives --set python /usr/bin/python3
 
 RUN pip3 install Cython pytest
+
+ARG MINICONDA_URL=https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+RUN wget ${MINICONDA_URL} -O miniconda.sh && \
+   bash miniconda.sh -b -p /data/conda && \
+   rm miniconda.sh
+ENV PATH="/data/conda/bin:$PATH"
+RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+   conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+   conda create -n image_proc python=3.11 -y && \
+   conda run -n image_proc pip install pillow mpi4py numpy pandas opencv-python opencv-python-headless -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple-i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 ARG GOSU_VERSION=1.17
 
@@ -67,13 +81,13 @@ RUN set -x \
     && rm -rf slurm \
     && groupadd -r --gid=990 slurm \
     && useradd -r -g slurm --uid=990 slurm \
-    && mkdir /etc/sysconfig/slurm \
+    && mkdir -p /etc/sysconfig/slurm \
         /var/spool/slurmd \
         /var/run/slurmd \
         /var/run/slurmdbd \
         /var/lib/slurmd \
         /var/log/slurm \
-        /data \
+        /data/slurm-image-proc-demo \
     && touch /var/lib/slurmd/node_state \
         /var/lib/slurmd/front_end_state \
         /var/lib/slurmd/job_state \
@@ -88,6 +102,7 @@ RUN set -x \
 
 COPY slurm.conf /etc/slurm/slurm.conf
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
+COPY slurm-image-proc-demo /data/slurm-image-proc-demo
 RUN set -x \
     && chown slurm:slurm /etc/slurm/slurmdbd.conf \
     && chmod 600 /etc/slurm/slurmdbd.conf

@@ -1,0 +1,10 @@
+*~
+_*
+*.jpg
+*.png
+*.json
+*.pyc
+*_
+*.err
+*.out
+*.txt
