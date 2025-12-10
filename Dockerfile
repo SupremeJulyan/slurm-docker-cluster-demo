@@ -51,13 +51,13 @@ ENV PATH="/data/conda/bin:$PATH"
 RUN conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
    conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
    conda create -n image_proc python=3.11 -y && \
-   conda run -n image_proc pip install pillow mpi4py numpy pandas opencv-python opencv-python-headless -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple-i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
+   conda run -n image_proc pip install pillow mpi4py numpy pandas opencv-python opencv-python-headless -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple
 
 ARG GOSU_VERSION=1.17
 
 RUN set -ex \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64.asc" \
+    && wget -e use_proxy=yes -e http_proxy=windowsip:7890 -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64" \
+    && wget -e use_proxy=yes -e http_proxy=windowsip:7890 -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-amd64.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
@@ -68,6 +68,8 @@ RUN set -ex \
 ARG SLURM_TAG
 
 RUN set -x \
+    && git config --global http.proxy "windowsip:7890" \
+    && git config --global https.proxy "windowsip:7890" \
     && git clone -b ${SLURM_TAG} --single-branch --depth=1 https://github.com/SchedMD/slurm.git \
     && pushd slurm \
     && ./configure --enable-debug --prefix=/usr --sysconfdir=/etc/slurm \

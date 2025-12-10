@@ -30,7 +30,7 @@ if __name__ == "__main__":
     output_file = sys.argv[2]
     
     # 获取所有图像文件
-    if rank == 0:
+    if rank == 0:#主进程
         images = [f for f in os.listdir(input_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
         # 分发任务
         chunks = np.array_split(images, size)

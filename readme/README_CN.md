@@ -59,9 +59,9 @@ docker build --build-arg SLURM_TAG="slurm-21-08-6-1" -t slurm-docker-cluster:21.
 ## 🚀 启动集群
 
 当镜像构建完毕，就可以使用Docker Compose部署默认版本的slurm集群。
-
+在wget和git的位置好代理ip
 ```bash
-docker compose up -d
+docker compose-up -d
 ```
 
 如果想要覆盖`.env`中的设置，并指定特定的slurm版本，需使用`IMAGE_TAG`环境变量:
@@ -109,6 +109,10 @@ PARTITION AVAIL  TIMELIMIT  NODES  STATE NODELIST
 normal*      up 5-00:00:00      2   idle c[1-2]
 ```
 
+启动图像处理demo
+```bash
+[root@slurmctld /]# conda activate image_proc
+```
 ## 🧑‍💻 提交任务
 
 集群的所有节点挂载了`slurm_jobdir`数据卷，这使得任务文件可以通过`/data`目录共享。使用以下命令提交任务：
